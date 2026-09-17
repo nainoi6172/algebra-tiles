@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Algebra Tiles - สัมประสิทธิ์ a > 1</title>
+  <title>Algebra Tiles - รองรับสัมประสิทธิ์หน้า x เป็นลบ</title>
   <style>
     * { box-sizing: border-box; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
     body {
@@ -13,7 +13,7 @@
     h2 { margin: 5px 0; color: #2c3e50; font-size: 1.2rem; text-align: center; }
 
     #problem-card {
-      background: #ffffff; border: 2px solid #8e44ad; border-radius: 12px;
+      background: #ffffff; border: 2px solid #e67e22; border-radius: 12px;
       padding: 12px; width: 100%; max-width: 500px; text-align: center; margin-bottom: 10px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
@@ -25,14 +25,15 @@
     .feedback-error { color: #e74c3c; }
 
     #palette {
-      display: flex; gap: 15px; background: #ffffff; padding: 10px; border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 10px; align-items: center; justify-content: center; width: 100%; max-width: 500px;
+      display: flex; gap: 12px; background: #ffffff; padding: 10px; border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 10px; align-items: center; justify-content: center; width: 100%; max-width: 500px; overflow-x: auto;
     }
     .btn-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; }
     .tile-sample { border: 2px solid rgba(0,0,0,0.15); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff; }
-    .sample-x2 { width: 50px; height: 50px; background-color: #3498db; }
-    .sample-x  { width: 18px; height: 50px; background-color: #2ecc71; }
-    .sample-1  { width: 18px; height: 18px; background-color: #e74c3c; }
+    .sample-x2 { width: 45px; height: 45px; background-color: #3498db; }
+    .sample-px { width: 16px; height: 45px; background-color: #2ecc71; }
+    .sample-nx { width: 16px; height: 45px; background-color: #e67e22; } /* -x */
+    .sample-1  { width: 16px; height: 16px; background-color: #e74c3c; }
 
     #board {
       width: 100%; max-width: 500px; height: 380px; background-color: #ffffff;
@@ -46,8 +47,9 @@
     }
     .tile.selected { outline: 3px solid #f1c40f; z-index: 1000 !important; }
     .tile-x2 { background-color: #3498db; width: 100px; height: 100px; }
-    .tile-x  { background-color: #2ecc71; width: 20px; height: 100px; }
-    .tile-1  { background-color: #e74c3c; width: 20px; height: 20px; }
+    .tile-px { background-color: #2ecc71; width: 20px; height: 100px; }  /* +x */
+    .tile-nx { background-color: #e67e22; width: 20px; height: 100px; }  /* -x */
+    .tile-1  { background-color: #e74c3c; width: 20px; height: 20px; }   /* +1 */
 
     .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; width: 100%; max-width: 500px; }
     .btn { padding: 10px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: bold; cursor: pointer; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -61,11 +63,11 @@
 </head>
 <body>
 
-  <h2>Algebra Tiles (สัมประสิทธิ์ a > 1)</h2>
+  <h2>Algebra Tiles (สัมประสิทธิ์หน้า x เป็นลบ)</h2>
 
   <div id="problem-card">
     <div class="problem-title">โจทย์: จงแยกตัวประกอบพหุนาม</div>
-    <div class="problem-math" id="problem-text">2x² + 5x + 3</div>
+    <div class="problem-math" id="problem-text">x² - 5x + 6</div>
     <div id="feedback"></div>
   </div>
 
@@ -74,12 +76,16 @@
       <div class="tile-sample sample-x2">x²</div>
       <span>+ x²</span>
     </button>
-    <button class="btn-tile" onclick="createTile('x')">
-      <div class="tile-sample sample-x">x</div>
+    <button class="btn-tile" onclick="createTile('px')">
+      <div class="tile-sample sample-px">+x</div>
       <span>+ x</span>
     </button>
+    <button class="btn-tile" onclick="createTile('nx')">
+      <div class="tile-sample sample-nx">-x</div>
+      <span>- x</span>
+    </button>
     <button class="btn-tile" onclick="createTile('1')">
-      <div class="tile-sample sample-1">1</div>
+      <div class="tile-sample sample-1">+1</div>
       <span>+ 1</span>
     </button>
   </div>
@@ -88,7 +94,7 @@
 
   <div class="controls">
     <button class="btn btn-check" onclick="checkAnswer()">✅ ตรวจคำตอบ</button>
-    <button class="btn btn-random" onclick="generateProblem()">🎲 สุ่มโจทย์ a > 1</button>
+    <button class="btn btn-random" onclick="generateProblem()">🎲 สุ่มโจทย์ลบ</button>
     <button class="btn btn-rotate" onclick="rotateSelectedTile()">🔄 หมุนชิ้นส่วน</button>
     <button class="btn btn-delete" onclick="deleteSelectedTile()">🗑️ ลบชิ้นที่เลือก</button>
     <button class="btn btn-clear" onclick="clearBoard()">🧹 ล้างกระดาน</button>
@@ -98,14 +104,14 @@
     const board = document.getElementById('board');
     const GRID_SIZE = 20;
     let selectedTile = null;
-    let currentTarget = { a1: 2, b1: 1, a2: 1, b2: 3, a: 2, b: 7, c: 3 }; // (a1*x + b1)(a2*x + b2)
+    let currentTarget = { a1: 1, b1: -2, a2: 1, b2: -3, a: 1, b: -5, c: 6 };
 
     function generateProblem() {
-      // สุ่ม (a1*x + b1)(a2*x + b2)
+      // สุ่ม (ax - m)(bx - n)
       const a1 = Math.floor(Math.random() * 2) + 1; // 1 หรือ 2
-      const a2 = (a1 === 1) ? 2 : 1;                // ให้มีอันนึงเป็น 2 เสมอ เพื่อเน้น a=2
-      const b1 = Math.floor(Math.random() * 3) + 1;
-      const b2 = Math.floor(Math.random() * 2) + 1;
+      const a2 = 1;
+      const b1 = -(Math.floor(Math.random() * 3) + 1); // ค่าติดลบ
+      const b2 = -(Math.floor(Math.random() * 3) + 1); // ค่าติดลบ
 
       const a = a1 * a2;
       const b = (a1 * b2) + (a2 * b1);
@@ -113,7 +119,12 @@
 
       currentTarget = { a1, b1, a2, b2, a, b, c };
 
-      document.getElementById('problem-text').innerText = `${a}x² + ${b}x + ${c}`;
+      // จัดรูปแบบการแสดงผลเครื่องหมาย
+      const bSign = b < 0 ? `- ${Math.abs(b)}` : `+ ${b}`;
+      const cSign = c < 0 ? `- ${Math.abs(c)}` : `+ ${c}`;
+      const aStr = a > 1 ? `${a}` : '';
+
+      document.getElementById('problem-text').innerText = `${aStr}x² ${bSign}x ${cSign}`;
       document.getElementById('feedback').innerText = '';
       
       clearBoard();
@@ -122,17 +133,24 @@
 
     function autoPopulateTiles(countX2, countX, count1) {
       let startX = 20, startY = 20;
+
+      // เพิ่ม x²
       for (let i = 0; i < countX2; i++) {
         createTile('x2', startX, startY);
         startX += 110;
         if (startX > 400) { startX = 20; startY += 110; }
       }
-      for (let i = 0; i < countX; i++) {
-        createTile('x', startX, startY);
+
+      // เพิ่ม x (แยกชิ้นส่วนบวก / ลบ)
+      const tileTypeX = countX < 0 ? 'nx' : 'px';
+      for (let i = 0; i < Math.abs(countX); i++) {
+        createTile(tileTypeX, startX, startY);
         startX += 30;
         if (startX > 420) { startX = 20; startY += 110; }
       }
-      for (let i = 0; i < count1; i++) {
+
+      // เพิ่ม 1
+      for (let i = 0; i < Math.abs(count1); i++) {
         createTile('1', startX, startY);
         startX += 30;
         if (startX > 420) { startX = 20; startY += 30; }
@@ -145,8 +163,9 @@
       tile.dataset.type = type;
 
       if (type === 'x2') tile.innerText = 'x²';
-      else if (type === 'x') tile.innerText = 'x';
-      else if (type === '1') tile.innerText = '1';
+      else if (type === 'px') tile.innerText = '+x';
+      else if (type === 'nx') tile.innerText = '-x';
+      else if (type === '1') tile.innerText = '+1';
 
       tile.style.left = `${posX}px`;
       tile.style.top = `${posY}px`;
@@ -268,28 +287,31 @@
         return;
       }
 
-      // แปลงความกว้าง/ยาวเป็นหน่วย (100px = x = 5 grid units, 20px = 1 grid unit)
       const wUnits = boundingWidth / GRID_SIZE;
       const hUnits = boundingHeight / GRID_SIZE;
 
-      // คำนวณความยาวด้านในรูป (ax + b) และ (cx + d)
-      const numX_Width = Math.floor(wUnits / 5);
-      const num1_Width = wUnits % 5;
+      const numX_W = Math.floor(wUnits / 5);
+      const num1_W = wUnits % 5;
+      const numX_H = Math.floor(hUnits / 5);
+      const num1_H = hUnits % 5;
 
-      const numX_Height = Math.floor(hUnits / 5);
-      const num1_Height = hUnits % 5;
+      // ตรวจสอบขนาดความยาวด้าน
+      const absB1 = Math.abs(currentTarget.b1);
+      const absB2 = Math.abs(currentTarget.b2);
 
       const isMatch = (
-        (numX_Width === currentTarget.a1 && num1_Width === currentTarget.b1 && numX_Height === currentTarget.a2 && num1_Height === currentTarget.b2) ||
-        (numX_Width === currentTarget.a2 && num1_Width === currentTarget.b2 && numX_Height === currentTarget.a1 && num1_Height === currentTarget.b1)
+        (numX_W === currentTarget.a1 && num1_W === absB1 && numX_H === currentTarget.a2 && num1_H === absB2) ||
+        (numX_W === currentTarget.a2 && num1_W === absB2 && numX_H === currentTarget.a1 && num1_H === absB1)
       );
 
-      const strFactor1 = `${currentTarget.a1 > 1 ? currentTarget.a1 : ''}x + ${currentTarget.b1}`;
-      const strFactor2 = `${currentTarget.a2 > 1 ? currentTarget.a2 : ''}x + ${currentTarget.b2}`;
+      const strB1 = currentTarget.b1 < 0 ? `- ${absB1}` : `+ ${absB1}`;
+      const strB2 = currentTarget.b2 < 0 ? `- ${absB2}` : `+ ${absB2}`;
+      const strA1 = currentTarget.a1 > 1 ? `${currentTarget.a1}` : '';
+      const strA2 = currentTarget.a2 > 1 ? `${currentTarget.a2}` : '';
 
       if (isMatch) {
         feedback.className = 'feedback-success';
-        feedback.innerText = `🎉 ถูกต้อง! คำตอบคือ (${strFactor1})(${strFactor2})`;
+        feedback.innerText = `🎉 ถูกต้อง! คำตอบคือ (${strA1}x ${strB1})(${strA2}x ${strB2})`;
       } else {
         feedback.className = 'feedback-error';
         feedback.innerText = '❌ จัดเรียงเป็นสี่เหลี่ยมผืนผ้าแล้ว แต่ยังไม่สอดคล้องกับโจทย์ข้อนี้';
